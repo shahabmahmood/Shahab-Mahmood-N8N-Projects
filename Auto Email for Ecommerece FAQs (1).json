@@ -1,0 +1,207 @@
+{
+  "name": "Auto Email for Ecommerece FAQs",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3c382616-4918-40da-8f8b-871ac27d5853",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jRvC43kS8PQXrKwO",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.snippet }}",
+        "options": {
+          "systemMessage": "This AI agent is designed to automatically answer customer questions by retrieving accurate information from a Google Sheet containing FAQs. Whenever a customer asks a question, the agent:\n\nReads the query and understands the intent using AI.\n\nSearches the connected Google Sheet for the most relevant FAQ answer.\n\nDelivers an instant, well-structured response in a formal email format.\n\nResponse Guidelines for the Agent\n\nWhen replying to a customer, always use a polite and professional email style. Follow this structure:\n\nSubject: Clear and relevant to the customer’s question\nGreeting: “Dear [Customer Name],”\nBody: Provide a concise and accurate answer based on the Google Sheet FAQs. Use complete sentences and maintain a respectful tone.\nClosing: “Best regards,” or “Sincerely,” followed by your brand or support team name.\n\nThis ensures every response feels professional, trustworthy, and helpful while maintaining a consistent brand voice."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0aa691eb-55e1-4b4b-a75e-cbbe47840e1a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        64,
+        208
+      ],
+      "id": "c1c3178d-7a65-4873-b3ad-e967216cc273",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SwewEPfjXZ6kLmcQ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.threadId }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        208
+      ],
+      "id": "edbd54ef-b54b-4447-91a2-dcfb99f97635",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1io3ugEnPU45K-Ib2iQCpo4iV9Vk3iyvEQEaN8sIAfMo",
+          "mode": "list",
+          "cachedResultName": "Ecommerce Store FAQs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1io3ugEnPU45K-Ib2iQCpo4iV9Vk3iyvEQEaN8sIAfMo/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1io3ugEnPU45K-Ib2iQCpo4iV9Vk3iyvEQEaN8sIAfMo/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        384,
+        192
+      ],
+      "id": "bbc441d4-fbb4-4862-9e40-c712303ae601",
+      "name": "Ecommerece Store FAQs",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fqFVBIVmKH9eVrqz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Gmail Trigger').item.json.threadId }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        0
+      ],
+      "id": "160de1fa-e760-4ad5-aebd-d2e9ae67c76d",
+      "name": "Reply to a message",
+      "webhookId": "cb01dbe7-2bc4-45fc-8483-a68dd9ff349e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jRvC43kS8PQXrKwO",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ecommerece Store FAQs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Reply to a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6cbaefa9-70c7-4266-a7ec-3ed748c223b9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a0fe24f80ec8847729ccec71f7b83cc9e747e79bcc2619433ea92d4c0dc667dd"
+  },
+  "id": "P0BBemSIWX8RszEP",
+  "tags": []
+}
