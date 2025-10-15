@@ -1,0 +1,321 @@
+{
+  "name": "Restuarent Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "When a user sends their first message (like hi, hello), reply with:\n\"Welcome to Sufi Restaurant Islamabad 👋\nHow can I help you today?\n🍽 Place an order\n❓ FAQ / Information\n✅ Check order / stock\"\n\n(Keep the tone friendly like a food delivery app, not like a product e-commerce site)\n\nIf user wants \"order\":\n\nAsk step by step: name, food item, quantity\n\nCheck inventory sheet before confirming\n\nIf available \"Your order for \"[item] (x quantity) is confirmed ✅\"\n\nIf not available \"Sorry, \"[item]\" is out of stock ❌. Available options: [list items]\"\n\nOnly confirmed orders go into the orders sheet\n\nIn Orders sheet always include:\nStatus = confirmed / Rejected\nDescription = \"Order accepted (item available)\" OR \"Order rejected (out of stock)\"\nAlso ask complete address before placing order .if costumer give complete address then confirm order\n\nIf user wants \"faq\":\n\nAnswer short and clear (delivery time, payment method, restaurant hours)\n\nIf user wants \"check order\" or \"check stock\":\n\nLook up in Google Sheets (Orders / Inventory)\n\nIf checking order - reply with status (Confirmed / Rejected / Cancelled / Delivered)\n\nIf checking stock - reply with available quantity of that food\n\nAlso list all \"available\" food items with quantity if requested\n\nIf user wants \"cancel order\":\n\nReply politely:\n\"Sorry 🙏 I cannot cancel orders directly.\nPlease call the restaurant owner first and inform them.\nOwner contact: +923105578080\"\n\nAlways reply in short text like a normal whatsapp chat\n\nDo not use \"bold\" or long paragraphs\n\nUse \"stars\" only for highlighting words\n\nKeep tone friendly, polite, and food-delivery app style"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        -80,
+        -32
+      ],
+      "id": "df9894e2-79b6-4aab-8f99-da6a4095245e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        176
+      ],
+      "id": "b924bbad-d83b-4f84-b583-ad3c6f497684",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "SwewEPfjXZ6kLmcQ",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 20
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        176
+      ],
+      "id": "46693c07-00ab-472b-b645-3cf739d33f26",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1UR9LERhquLnRVwO8dVdHRyONpaMll3q6dGQKdyAjUNY",
+          "mode": "list",
+          "cachedResultName": "Sufi Resturent Islamabad ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UR9LERhquLnRVwO8dVdHRyONpaMll3q6dGQKdyAjUNY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Inventory",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UR9LERhquLnRVwO8dVdHRyONpaMll3q6dGQKdyAjUNY/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        176
+      ],
+      "id": "5c62ba8b-0065-4e2f-9f04-c8be312bff86",
+      "name": "Food Inventry",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OIT15dxjGRrH5Tib",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1UR9LERhquLnRVwO8dVdHRyONpaMll3q6dGQKdyAjUNY",
+          "mode": "list",
+          "cachedResultName": "Sufi Resturent Islamabad ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UR9LERhquLnRVwO8dVdHRyONpaMll3q6dGQKdyAjUNY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 384284156,
+          "mode": "list",
+          "cachedResultName": "FAQs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UR9LERhquLnRVwO8dVdHRyONpaMll3q6dGQKdyAjUNY/edit#gid=384284156"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        176,
+        160
+      ],
+      "id": "ed16b88f-0484-47e5-aebf-5e13175917c9",
+      "name": "FAQs",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OIT15dxjGRrH5Tib",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1UR9LERhquLnRVwO8dVdHRyONpaMll3q6dGQKdyAjUNY",
+          "mode": "list",
+          "cachedResultName": "Sufi Resturent Islamabad ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UR9LERhquLnRVwO8dVdHRyONpaMll3q6dGQKdyAjUNY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1484415057,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UR9LERhquLnRVwO8dVdHRyONpaMll3q6dGQKdyAjUNY/edit#gid=1484415057"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "   Customer Name ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('___Customer_Name_', ``, 'string') }}",
+            "Food Item": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Food_Item', ``, 'string') }}",
+            "Quantity Ordered": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Quantity_Ordered', ``, 'string') }}",
+            "Full Address": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Full_Address', ``, 'string') }}",
+            "Status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Status', ``, 'string') }}",
+            "Order Date": "={{ $now.format(\"yyyy-mm-dd:hh:mm\") }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "   Customer Name ",
+              "displayName": "   Customer Name ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Food Item",
+              "displayName": "Food Item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Quantity Ordered",
+              "displayName": "Quantity Ordered",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Order Date",
+              "displayName": "Order Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Address",
+              "displayName": "Full Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        304,
+        160
+      ],
+      "id": "fb72eae4-e6b4-4445-91d0-c2f1df992398",
+      "name": "Orders",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "OIT15dxjGRrH5Tib",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        -32
+      ],
+      "id": "c3e3e253-338e-42bb-9b68-19d488a4ccb1",
+      "name": "When chat message received",
+      "webhookId": "4038b071-a9af-4d37-bf22-ab0b8fc55489"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Food Inventry": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FAQs": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orders": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2646ce00-a03c-4a3f-952b-10b88c15be24",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a0fe24f80ec8847729ccec71f7b83cc9e747e79bcc2619433ea92d4c0dc667dd"
+  },
+  "id": "KP5vu5u0KsxkaI8A",
+  "tags": []
+}
