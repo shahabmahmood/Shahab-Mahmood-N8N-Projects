@@ -1,0 +1,340 @@
+{
+  "name": "Auto Email For Ecommerece",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        80
+      ],
+      "id": "b8586074-b05d-47b5-8ab2-6d149eedb47c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Pur95TUVtCzL_VMak4GayO24mw5wskr9v98xebaEFeQ",
+          "mode": "list",
+          "cachedResultName": "ecommerce_orders_data (N8N)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Pur95TUVtCzL_VMak4GayO24mw5wskr9v98xebaEFeQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1019972320,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Pur95TUVtCzL_VMak4GayO24mw5wskr9v98xebaEFeQ/edit#gid=1019972320"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -496,
+        80
+      ],
+      "id": "af1980f0-b25c-42d2-b033-12a08593ac13",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "fqFVBIVmKH9eVrqz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8dfc98a7-398b-449e-a441-365a0f14175d",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Shipped",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -272,
+        80
+      ],
+      "id": "c69e8f8f-0824-4617-9c0f-f8606136669a",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.Status }}",
+                    "rightValue": "Cancelled",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "5e3937b1-a9c4-462c-b19c-2672ddf6ac11"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "0a13e788-4dd1-405f-b2bc-cd7aa733938d",
+                    "leftValue": "={{ $json.Status }}",
+                    "rightValue": "Returned",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "f921f2c6-0dde-49e1-81bf-0947b35a206e",
+                    "leftValue": "={{ $json.Status }}",
+                    "rightValue": "Pending",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -48,
+        48
+      ],
+      "id": "5856e678-041d-45ce-be71-239e9f415b25",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Cancel Order,",
+        "message": "=Hi {{ $json.Customer_Name }} We noticed your order for {{ $json.Product_Name }} canceled. Is there something we could have done differently?\nRegard \nShahab Mahmood.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        176,
+        -208
+      ],
+      "id": "8e698290-9120-488d-89e4-5956697b7c60",
+      "name": "Cancel Order Email 1",
+      "webhookId": "e8147a46-5d30-45a8-9745-5b26c82db396",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jRvC43kS8PQXrKwO",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Order Return,",
+        "message": "=Hi {{ $json.Customer_Name }}.We noticed you returned your order {{ $json.Product_Name }} . Could you tell us what went wrong?\nRegard \nShahab Mahmood.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        176,
+        -16
+      ],
+      "id": "e2ad5753-390e-4301-8276-3659f6efa986",
+      "name": "Return order Email 2",
+      "webhookId": "e8147a46-5d30-45a8-9745-5b26c82db396",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jRvC43kS8PQXrKwO",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "Pending order,",
+        "message": "=Hi  {{ $json.Customer_Name }} Your order {{ $json.Product_Name }} is currently pending. Thank you for your patience!\nRegard \nShahab Mahmood.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        176,
+        176
+      ],
+      "id": "9e18d3bb-9f30-4f90-bd52-a804d8416170",
+      "name": "Pending order Email 3",
+      "webhookId": "e8147a46-5d30-45a8-9745-5b26c82db396",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jRvC43kS8PQXrKwO",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "Shahabmahmood121@gmail.com",
+        "subject": "Notice,",
+        "message": "=Kindly check  {{ $json.Email }},{{ $json.Customer_Name }} they have issues kindly resolve.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        176,
+        368
+      ],
+      "id": "17e34fa1-c1f5-4de6-bbc8-f71a55a8f35e",
+      "name": "Email bck to company to resolve issue 4",
+      "webhookId": "e8147a46-5d30-45a8-9745-5b26c82db396",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jRvC43kS8PQXrKwO",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Cancel Order Email 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Return order Email 2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Pending order Email 3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Email bck to company to resolve issue 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c5e58ace-e744-4056-944b-11f411b9bdd4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a0fe24f80ec8847729ccec71f7b83cc9e747e79bcc2619433ea92d4c0dc667dd"
+  },
+  "id": "8aFz93XzpXQ20c81",
+  "tags": []
+}
